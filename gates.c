@@ -4,6 +4,8 @@
 #include "gates.h"
 
 bool NAND(bool a, bool b){
+    // NAND is the fundamental gate, so we can't build it from other gates
+    // Therefore we must use the built-in ! and && operators here
     return !(a && b);
 }
 

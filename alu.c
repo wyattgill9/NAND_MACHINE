@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <stdio.h>
+#include "alu.h"
 
 void full_adder(bool a, bool b, bool cin, bool *sum, bool *cout) {
     bool ab_xor = XOR(a, b);
@@ -43,39 +44,40 @@ void sub64(bool A[64], bool B[64], bool result[64], bool *carry_out) {
     add64(A, B_plus_one, result, carry_out);
 }
 
+void shift_left64(bool A[64], bool result[64]) {
+    for (int i = 0; i < 63; ++i) {
+        result[i] = A[i + 1];
+    }
+    result[63] = 0;
+}
+
+void shift_right64(bool A[64], bool result[64]) {
+    for (int i = 1; i < 64; ++i) {
+        result[i - 1] = A[i];
+    }
+    result[63] = 0;
+}
+
+void mult64(bool A[64], bool B[64], bool result[64], bool *carry_out) {
+    bool temp_A[64];
+    bool temp_result[64] = {0};
+
+    *carry_out = 0;
+
+    for (int i = 0; i < 64; ++i) {
+        if (AND(B[i], 1)) {
+            add64(temp_result, A, result, carry_out);
+        }
+
+        shift_left64(A, temp_A);
+        for (int j = 0; j < 64; ++j) {
+            A[j] = temp_A[j];
+        }
+    }
+}
+
 void print_binary(bool arr[64]) {
     for (int i = 63; i >= 0; i--) {
         printf("%d", arr[i]);
     }
 }
-
-int main() {
-    bool A[64] = {
-        1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1,
-        1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1,
-        0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0,
-        0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1
-    };
-    bool B[64] = {
-        0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0,
-        1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1,
-        0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0,
-        1, 1, 0, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1
-    };
-
-    bool result[64];
-    bool carry_out;
-
-    sub64(A, B, result, &carry_out);
-
-    printf("A = ");
-    print_binary(A);
-    printf("\nB = ");
-    print_binary(B);
-    printf("\nResult (A - B) = ");
-    print_binary(result);
-    printf("\nCarry out = %d\n", carry_out);
-
-    return 0;
-}
-
