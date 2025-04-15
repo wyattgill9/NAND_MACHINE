@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<stdbool.h>
 #include<assert.h>
+#include "gates.h"
 
 bool NAND(bool a, bool b){
     return !(a && b);
@@ -86,9 +87,4 @@ void run_tests() {
     assert(XNOR(true, true) == true);
 
     printf("All tests passed!\n");
-}
-
-int main(){
-    run_tests();
-    return 0;
 }
