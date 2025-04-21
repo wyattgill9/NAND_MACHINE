@@ -76,8 +76,110 @@ void mult64(bool A[64], bool B[64], bool result[64], bool *carry_out) {
     }
 }
 
+void div64(bool A[64], bool B[64], bool quotient[64], bool remainder[64], bool *error) {
+    bool is_B_zero = true;
+    for (int i = 0; i < 64; i++) {
+        if (B[i]) {
+            is_B_zero = false;
+            break;
+        }
+    }
+    
+    if (is_B_zero) {
+        *error = true;
+        // Clear quotient and remainder
+        for (int i = 0; i < 64; i++) {
+            quotient[i] = false;
+            remainder[i] = false;
+        }
+        return;
+    }
+    
+    *error = false;
+    
+    for (int i = 0; i < 64; i++) {
+        quotient[i] = false;
+        remainder[i] = A[i];
+    }
+    
+    for (int i = 63; i >= 0; i--) {
+        bool temp_remainder[64];
+        shift_left64(remainder, temp_remainder);
+        for (int j = 0; j < 64; j++) {
+            remainder[j] = temp_remainder[j];
+        }
+        
+        bool temp[64];
+        bool borrow;
+        sub64(remainder, B, temp, &borrow);
+        
+        if (!borrow) {
+            quotient[i] = true;
+            
+            for (int j = 0; j < 64; j++) {
+                remainder[j] = temp[j];
+            }
+        }
+    }
+}
+
+void mod64(bool A[64], bool B[64], bool result[64], bool *error) {
+
+    bool quotient[64];
+    
+    div64(A, B, quotient, result, error);
+    
+} 
+void mov64(bool src[64], bool dest[64]) {
+    for (int i = 0; i < 64; i++) {
+        dest[i] = src[i];
+    }
+}
+
 void print_binary(bool arr[64]) {
     for (int i = 63; i >= 0; i--) {
         printf("%d", arr[i]);
     }
+}
+
+void and64(bool A[64], bool B[64], bool result[64]) {
+    for (int i = 0; i < 64; i++) {
+        result[i] = AND(A[i], B[i]);
+    }
+}
+
+void or64(bool A[64], bool B[64], bool result[64]) {
+    for (int i = 0; i < 64; i++) {
+        result[i] = OR(A[i], B[i]);
+    }
+}
+
+void xor64(bool A[64], bool B[64], bool result[64]) {
+    for (int i = 0; i < 64; i++) {
+        result[i] = XOR(A[i], B[i]);
+    }
+}
+
+void clear64(bool A[64]) {
+    for (int i = 0; i < 64; i++) {
+        A[i] = 0;
+    }
+}
+
+bool equals64(bool A[64], bool B[64]) {
+    for (int i = 0; i < 64; i++) {
+        if (A[i] != B[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool is_zero64(bool A[64]) {
+    for (int i = 0; i < 64; i++) {
+        if (A[i]) {
+            return false;
+        }
+    }
+    return true;
 }
