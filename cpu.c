@@ -4,12 +4,29 @@
 #include <stdio.h>
 #include "alu.h"
 
+void ullong_to_bool(unsigned long long n, bool word[64]);
+
 unsigned long long bool_to_ullong(bool word[64]) {
     unsigned long long result = 0;
     for (int i = 0; i < 64; i++) {
-        if (AND(word[i], 1)) {
+        if (word[i]) {  
             unsigned long long mask = 1ULL << i;
-            result = result + mask; 
+            bool carry_out;
+            bool result_bool[64];
+            bool mask_bool[64];
+            
+            ullong_to_bool(result, result_bool);
+            
+            ullong_to_bool(mask, mask_bool);
+            
+            add64(result_bool, mask_bool, result_bool, &carry_out);
+            
+            result = 0;
+            for (int j = 0; j < 64; j++) {
+                if (word[j]) {
+                    result |= (1ULL << j);
+                }
+            }
         }
     }
     return result;
@@ -17,9 +34,25 @@ unsigned long long bool_to_ullong(bool word[64]) {
 
 void ullong_to_bool(unsigned long long n, bool word[64]) {
     for (int i = 0; i < 64; i++) {
-        unsigned long long mask = 1ULL << i;
-        bool bit_set = AND((n & mask) != 0, 1);
-        word[i] = bit_set;
+        bool mask[64] = {0};
+        mask[0] = true;
+        
+        bool temp[64];
+        for (int j = 0; j < i; j++) {
+            shift_left64(mask, temp);
+            for (int k = 0; k < 64; k++) {
+                mask[k] = temp[k];
+            }
+        }
+        
+        unsigned long long mask_val = 0;
+        for (int j = 0; j < 64; j++) {
+            if (mask[j]) {
+                mask_val |= (1ULL << j);
+            }
+        }
+        
+        word[i] = AND((n & mask_val) != 0, true);
     }
 }
 
@@ -63,4 +96,3 @@ int main() {
     fib();
     return 0;
 }
-
