@@ -1,6 +1,8 @@
 #include "memory.h"
 #include <assert.h>
 
+// REMOVE THIS IN FAVOR OF D FLIP FLOPS
+
 void init_memory(Memory* mem) {
     clear_memory(mem);
 }

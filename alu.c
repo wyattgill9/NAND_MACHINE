@@ -1,8 +1,14 @@
 #include "gates.h"
-#include <stdbool.h>
-#include <assert.h>
-#include <stdio.h>
 #include "alu.h"
+#include <stdbool.h>
+#include <stdio.h>
+
+void print_binary(bool arr[64]) {
+    for (int i = 0; i < 64; i++) {
+        printf("%d", arr[i]);
+    }
+    printf("\n");
+}
 
 void full_adder(bool a, bool b, bool cin, bool *sum, bool *cout) {
     bool ab_xor = XOR(a, b);
@@ -136,12 +142,6 @@ void mov64(bool src[64], bool dest[64]) {
     }
 }
 
-void print_binary(bool arr[64]) {
-    for (int i = 63; i >= 0; i--) {
-        printf("%d", arr[i]);
-    }
-}
-
 void and64(bool A[64], bool B[64], bool result[64]) {
     for (int i = 0; i < 64; i++) {
         result[i] = AND(A[i], B[i]);
@@ -167,19 +167,18 @@ void clear64(bool A[64]) {
 }
 
 bool equals64(bool A[64], bool B[64]) {
+    bool unequal = false;
     for (int i = 0; i < 64; i++) {
-        if (A[i] != B[i]) {
-            return false;
-        }
+        bool bit_xor = XOR(A[i], B[i]);
+        unequal = OR(unequal, bit_xor);  
     }
-    return true;
+    return NOT(unequal);
 }
 
 bool is_zero64(bool A[64]) {
-    for (int i = 0; i < 64; i++) {
-        if (A[i]) {
-            return false;
-        }
+    bool result = false;
+    for (int i = 0; i < 64; ++i) {
+        result = OR(result, A[i]); // result || A[i];
     }
-    return true;
+    return NOT(result);
 }
